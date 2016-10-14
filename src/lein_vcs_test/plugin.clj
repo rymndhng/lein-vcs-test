@@ -6,6 +6,8 @@
 
 (def ^:dynamic *commit-base* "master")
 
+(def log-unchanged (delay (main/info "lein-vcs-test: No changed files in vcs.")))
+
 (defn- read-changed-files! []
   ;; TODO: allow setting the diff base
   (let [exec (shell/sh "git" "diff" "--name-only" "--diff-filter=AMR"  *commit-base*)]
@@ -13,7 +15,7 @@
           (main/abort "Unable to find vcs changed files." (:exit exec) (:err exec))
 
           (= "" (:out exec))
-          (main/info "lein-vcs-test: No changed files in vcs.")
+          (deref log-unchanged)
 
           :else
           (string/split (:out exec) #"\n"))))
