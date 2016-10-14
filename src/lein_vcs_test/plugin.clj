@@ -1,4 +1,4 @@
-(ns leiningen.vcs-test.plugin
+(ns lein-vcs-test.plugin
   (:require [leiningen.core.main :as main]
             [bultitude.core :as b]
             [clojure.java.shell :as shell]
@@ -8,14 +8,14 @@
 
 (defn- read-changed-files! []
   ;; TODO: allow setting the diff base
-  (let [exec (shell/sh "git" "diff" "--name-only" *commit-base*)]
+  (let [exec (shell/sh "git" "diff" "--name-only" "--diff-filter=AMR"  *commit-base*)]
     (cond (not= 0 (:exit exec))
           (main/abort "Unable to find vcs changed files." (:exit exec) (:err exec))
 
           (= "" (:out exec))
-          (main/warn "No vcs staged files ")
+          (main/info "lein-vcs-test: No changed files in vcs.")
 
-          :otherwise
+          :else
           (string/split (:out exec) #"\n"))))
 
 (defn modified-namespaces! []
@@ -30,7 +30,9 @@
   `(fn [test#]
      (contains? '~modified-namespaces (symbol (str (:ns test#))))))
 
-(defn middleware [project]
+(defn middleware
+  "Should autoload by leiningen."
+  [project & args]
   (binding [*commit-base* (or (get-in project [:vcs-test :commit-base] *commit-base*))]
     (doto (assoc-in project [:test-selectors :vcs]
                     (->> (modified-namespaces!)

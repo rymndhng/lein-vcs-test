@@ -1,4 +1,4 @@
-(ns leiningen.vcs-test-test
+(ns lein-vcs-test-test
   (:require [clojure.test :refer :all]))
 
 (deftest a-test
