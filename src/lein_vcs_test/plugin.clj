@@ -9,7 +9,6 @@
 (def log-unchanged (delay (main/info "lein-vcs-test: No changed files in vcs.")))
 
 (defn- read-changed-files! []
-  ;; TODO: allow setting the diff base
   (let [exec (shell/sh "git" "diff" "--name-only" "--diff-filter=AMR"  *commit-base*)]
     (cond (not= 0 (:exit exec))
           (main/abort "Unable to find vcs changed files." (:exit exec) (:err exec))
@@ -34,11 +33,18 @@
 
 (defn middleware
   "Should autoload by leiningen."
-  [project & args]
-  (binding [*commit-base* (or (get-in project [:vcs-test :commit-base] *commit-base*))]
-    (doto (assoc-in project [:test-selectors :vcs]
-                    (->> (modified-namespaces!)
-                         (filter some?)
-                         (mapcat (fn [x] [x (test-namespace-of x)]))
-                         set
-                         selector-form)))))
+  [project]
+  (binding [*commit-base*     (get-in project [:vcs-test :commit-base] *commit-base*)]
+    (let [namespaces          (filter some? (modified-namespaces!))
+          patch-eastwood?     (get-in project [:eastwood :vcs])]
+
+      ;; patch namespaces to have custom filters
+      (-> project
+          ;; lein eastwood
+          (update [:eastwood :namespaces] (fn [old-namespaces] (if patch-eastwood?
+                                                                 namespaces
+                                                                 old-namespaces)))
+
+          ;; lein test
+          (assoc-in [:test-selectors :vcs] (selector-form
+                                             (set (mapcat (fn [x] [x (test-namespace-of x)])  namespaces))))))))

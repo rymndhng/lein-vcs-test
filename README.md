@@ -1,12 +1,20 @@
 # lein-vcs-test
 
-A Leiningen plugin to only test namespaces that have been modified. When working
-with larger repositories, you'll want to get fast feedback on changed
-namespaces. With VCS workflows, you typically have a commit-base (i.e. develop/master).
+A Leiningen plugin to filter files consumed in linting and testing based on
+changes in version control.
 
-lein-vcs-test uses the underlying vcs system to determine which files have
-changed since the base commit and tries to find test namespaces that correspond
-to these namespaces.
+Inspired by `arc diff` in Phabricator's arcanist command.
+
+## Motivation
+
+When working with larger repositories, you will have many namespaces. Most of
+the time, your fixes do not touch all the namespaces. Linting and testing the
+entire project can take a long time. Instead, we should have the ability to only
+lint and test files that have changed (i.e. for a pull request builder).
+
+lein-vcs-test uses the underlying vcs system to determine which files have been
+touched compared to a commit-base (by default `master`). lein-vcs-test tries to
+find test namespaces that correspond to these changed clojure files.
 
 ## Installation
 
@@ -18,6 +26,16 @@ This plugin hooks into the existing lein test by adding a custom selector. To
 run tests that have only changed since the commit-base, use:
 
 lein test :vcs
+
+This also has support for the eastwood linter. To use this feature, add the
+following entry to eastwood's configuration:
+
+
+``` clojure
+(defproject myproject
+  :eastwood {:vcs true}
+)
+```
 
 ## Configuration
 
