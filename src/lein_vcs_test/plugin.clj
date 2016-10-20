@@ -11,7 +11,7 @@
 (defn- read-changed-files! []
   (let [exec (shell/sh "git" "diff" "--name-only" "--diff-filter=AMR"  *commit-base*)]
     (cond (not= 0 (:exit exec))
-          (main/abort "Unable to find vcs changed files." (:exit exec) (:err exec))
+          (main/warn "Unable to find vcs changed files. Skipping lein-vcs-test. Cause:\n" (:exit exec) (:err exec))
 
           (= "" (:out exec))
           (deref log-unchanged)
@@ -38,13 +38,15 @@
     (let [namespaces          (filter some? (modified-namespaces!))
           patch-eastwood?     (get-in project [:eastwood :lein-vcs-test/enabled])]
 
-      ;; patch namespaces to have custom filters
-      (-> project
-          ;; lein eastwood
-          (update-in [:eastwood :namespaces] (fn [old-namespaces] (if patch-eastwood?
-                                                                 namespaces
-                                                                 old-namespaces)))
+      (if (empty? namespaces)
+        project
+        ;; patch namespaces to have custom filters
+        (-> project
+            ;; lein eastwood
+            (update-in [:eastwood :namespaces] (fn [old-namespaces] (if patch-eastwood?
+                                                                      namespaces
+                                                                      old-namespaces)))
 
-          ;; lein test
-          (assoc-in [:test-selectors :vcs] (selector-form
-                                             (set (mapcat (fn [x] [x (test-namespace-of x)])  namespaces))))))))
+            ;; lein test
+            (assoc-in [:test-selectors :vcs] (selector-form
+                                               (set (mapcat (fn [x] [x (test-namespace-of x)])  namespaces)))))))))
