@@ -1,4 +1,4 @@
-(defproject lein-vcs-test "0.1.0"
+(defproject lein-vcs-test "0.1.1-SNAPSHOT"
   :description "Leiningen optimizations for testing with Version Controlled Systems"
   :url "https://github.com/rymndhng/lein-vcs-test"
   :license {:name "Eclipse Public License"
