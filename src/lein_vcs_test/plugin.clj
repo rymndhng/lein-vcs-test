@@ -36,12 +36,12 @@
   [project]
   (binding [*commit-base*     (get-in project [:vcs-test :commit-base] *commit-base*)]
     (let [namespaces          (filter some? (modified-namespaces!))
-          patch-eastwood?     (get-in project [:eastwood :vcs])]
+          patch-eastwood?     (get-in project [:eastwood :lein-vcs-test/enabled])]
 
       ;; patch namespaces to have custom filters
       (-> project
           ;; lein eastwood
-          (update [:eastwood :namespaces] (fn [old-namespaces] (if patch-eastwood?
+          (update-in [:eastwood :namespaces] (fn [old-namespaces] (if patch-eastwood?
                                                                  namespaces
                                                                  old-namespaces)))
 

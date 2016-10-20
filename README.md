@@ -27,13 +27,13 @@ run tests that have only changed since the commit-base, use:
 
 lein test :vcs
 
-This also has support for the eastwood linter. To use this feature, add the
-following entry to eastwood's configuration:
+This also has support for the eastwood linter. To enable this feature
+(regardless of selector), add the following entry to eastwood's configuration:
 
 
 ``` clojure
 (defproject myproject
-  :eastwood {:vcs true}
+  :eastwood {:lein-vcs-test/enabled true}
 )
 ```
 
@@ -43,7 +43,7 @@ By default, the commit-base is set to "master". You can change this by setting a
 
 ``` clojure
 (defproject myproject
-  :plugins [[lein-vcs-test "0.1.2"]]
+  :plugins [[lein-vcs-test "0.1.1"]]
   :vcs-test {:commit-base "develop"})
 ```
 
