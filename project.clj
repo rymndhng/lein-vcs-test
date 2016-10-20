@@ -5,5 +5,6 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :eval-in-leiningen true
   :vcs-test {:commit-base "master"}
+  :deploy-repositories [["releases" :clojars]]
   :plugins [[lein-vcs-test "0.1.0-SNAPSHOT"]
             [jonase/eastwood "0.2.3"]])
