@@ -6,5 +6,5 @@
   :eval-in-leiningen true
   :vcs-test {:commit-base "master"}
   :deploy-repositories [["releases" :clojars]]
-  :plugins [[lein-vcs-test "0.1.0-SNAPSHOT"]
+  :plugins [[lein-vcs-test "0.1.1"]
             [jonase/eastwood "0.2.3"]])
