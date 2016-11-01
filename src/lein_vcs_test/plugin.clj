@@ -4,12 +4,12 @@
             [clojure.java.shell :as shell]
             [clojure.string :as string]))
 
-(def ^:dynamic *commit-base* "master")
+(def ^:dynamic *commit-base* "origin/master")
 
 (def log-unchanged (delay (main/info "lein-vcs-test: No changed files in vcs.")))
 
 (defn- read-changed-files! []
-  (let [exec (shell/sh "git" "diff" "--name-only" "--diff-filter=AMR"  *commit-base*)]
+  (let [exec (shell/sh "git" "diff" "--name-only" "--diff-filter=AMR"  (str *commit-base* "..head"))]
     (cond (not= 0 (:exit exec))
           (main/warn "Unable to find vcs changed files. Skipping lein-vcs-test. Cause:\n" (:exit exec) (:err exec))
 
