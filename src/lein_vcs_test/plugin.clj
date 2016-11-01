@@ -34,19 +34,19 @@
 (defn middleware
   "Should autoload by leiningen."
   [project]
-  (binding [*commit-base*     (get-in project [:vcs-test :commit-base] *commit-base*)]
-    (let [namespaces          (filter some? (modified-namespaces!))
-          patch-eastwood?     (get-in project [:eastwood :lein-vcs-test/enabled])]
+  (binding [*commit-base* (get-in project [:vcs-test :commit-base] *commit-base*)]
+    (let [namespaces (filter some? (modified-namespaces!))
+          patch-eastwood? (get-in project [:eastwood :lein-vcs-test/enabled])]
 
-      (if (empty? namespaces)
-        project
-        ;; patch namespaces to have custom filters
-        (-> project
-            ;; lein eastwood
-            (update-in [:eastwood :namespaces] (fn [old-namespaces] (if patch-eastwood?
-                                                                      namespaces
-                                                                      old-namespaces)))
+      (when (empty? namespaces)
+        (main/warn "lein-vcs-test: No vcs-test namespaces found."))
 
-            ;; lein test
-            (assoc-in [:test-selectors :vcs] (selector-form
-                                               (set (mapcat (fn [x] [x (test-namespace-of x)])  namespaces)))))))))
+      ;; patch projects!
+      (-> project
+          ;; lein eastwood
+          (update-in [:eastwood :namespaces]
+                     (fn [old-namespaces] (if patch-eastwood? namespaces old-namespaces)))
+
+          ;; lein test
+          (assoc-in [:test-selectors :vcs] (selector-form
+                                             (set (mapcat (fn [x] [x (test-namespace-of x)])  namespaces))))))))
